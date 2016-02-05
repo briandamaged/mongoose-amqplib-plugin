@@ -7,22 +7,29 @@ const hooks = require('./hooks'),
 
 const createPublisher = require('./publisher');
 
-function createPlugin(amqpChannel, exchange, routingKey, options) {
-  const publisher = createPublisher(amqpChannel, exchange, routingKey, options);
+// These are the "Global Options" that will be used when
+// creating new plugin instances.  They can be overridden
+// by both Factory and Plugin options.
+const gOptions = {
+  exchange:   'model.events',
+  routingKey: ''
+};
 
-  const createdHook   = createCreatedHook(publisher);
-  const updatedHook   = createUpdatedHook(publisher);
-  const destroyedHook = createDestroyedHook(publisher);
 
-  return function(schema) {
-    schema.pre('save',    createdHook);
-    schema.pre('save',    updatedHook);
-    schema.post('remove', destroyedHook);
+function createPlugin(fOptions) {
+  fOptions = fOptions || {};
+
+  return function(schema, pOptions) {
+    const o = Object.assign({}, gOptions, fOptions, pOptions);
+    const p = createPublisher(o.channel, o.exchange, o.routingKey, o.options);
+
+    schema.pre('save',    createCreatedHook(p));
+    schema.pre('save',    createUpdatedHook(p));
+    schema.post('remove', createDestroyedHook(p));
   }
 }
 
 
-module.exports = {
-  createPublisher:      createPublisher,
-  createPlugin:         createPlugin
-}
+
+module.exports = createPlugin;
+
