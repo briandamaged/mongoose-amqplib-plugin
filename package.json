@@ -1,0 +1,25 @@
+{
+  "name": "mongoose-amqplib-plugin",
+  "version": "1.0.0",
+  "description": "Publish Mongoose models over AMQP",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/briandamaged/mongoose-amqplib-plugin.git"
+  },
+  "keywords": [
+    "mongoose",
+    "mongoose-plugin",
+    "amqplib",
+    "amqp"
+  ],
+  "author": "Brian Lauber",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/briandamaged/mongoose-amqplib-plugin/issues"
+  },
+  "homepage": "https://github.com/briandamaged/mongoose-amqplib-plugin#readme"
+}
