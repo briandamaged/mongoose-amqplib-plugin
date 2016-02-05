@@ -1,6 +1,6 @@
 {
   "name": "mongoose-amqplib-plugin",
-  "version": "1.0.0",
+  "version": "0.8.0",
   "description": "Publish Mongoose models over AMQP",
   "main": "src/index.js",
   "scripts": {
