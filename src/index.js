@@ -8,10 +8,8 @@ const hooks = require('./hooks'),
 
 const createPublisher = require('./publisher');
 
-const defaultOptions = require('./options');
-
 function plugin(schema, o) {
-  o = Object.assign({}, defaultOptions, o);
+  o = Object.assign({}, plugin.defaultOptions, o);
   const p = createPublisher(o.channel, o.exchange, o.routingKey, o.options);
 
   schema.pre('save', wasNewHook);
@@ -20,5 +18,10 @@ function plugin(schema, o) {
   schema.post('remove', createDestroyedHook(p));
 }
 
+
+plugin.defaultOptions = {
+  exchange:   'model.events',
+  routingKey: ''
+};
 
 module.exports = plugin;
