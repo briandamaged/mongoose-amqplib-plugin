@@ -1,6 +1,7 @@
 'use strict';
 
 const hooks = require('./hooks'),
+      wasNewHook          = hooks.wasNewHook,
       createCreatedHook   = hooks.createCreatedHook,
       createUpdatedHook   = hooks.createUpdatedHook,
       createDestroyedHook = hooks.createDestroyedHook;
@@ -13,8 +14,9 @@ function plugin(schema, o) {
   o = Object.assign({}, defaultOptions, o);
   const p = createPublisher(o.channel, o.exchange, o.routingKey, o.options);
 
-  schema.pre('save',    createCreatedHook(p));
-  schema.pre('save',    createUpdatedHook(p));
+  schema.pre('save', wasNewHook);
+  schema.post('save',   createCreatedHook(p));
+  schema.post('save',   createUpdatedHook(p));
   schema.post('remove', createDestroyedHook(p));
 }
 

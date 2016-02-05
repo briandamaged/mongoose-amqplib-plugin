@@ -1,12 +1,22 @@
 
 const createMessage = require('./message');
 
+
+// TODO: Extract this into a separate plugin.
+function wasNewHook(next) {
+  this.__previously = {
+    wasNew:         this.isNew,
+    modifiedPaths: this.modifiedPaths()
+  }
+
+  next();
+}
+
+
 function createCreatedHook(publisher) {
-  return function(next) {
-    const wasNew = this.isNew;
-    next();
-    if(wasNew) {
-      const msg = createMessage(this, "created");
+  return function(doc) {
+    if(doc.__previously.wasNew) {
+      const msg = createMessage(doc, "created");
       publisher(msg);
     }
   }
@@ -14,13 +24,10 @@ function createCreatedHook(publisher) {
 
 
 function createUpdatedHook(publisher) {
-  return function(next) {
-    const wasUpdated = !this.isNew;
-    const modified   = this.modifiedPaths();
-    next();
-    if(wasUpdated) {
+  return function(doc) {
+    if(!doc.__previously.wasNew) {
       const msg = createMessage(this, "updated");
-      msg.modified = modified;
+      msg.modifiedPaths = doc.__previously.modifiedPaths;
       publisher(msg);
     }
   }
@@ -28,13 +35,14 @@ function createUpdatedHook(publisher) {
 
 
 function createDestroyedHook(publisher) {
-  return function() {
-    const msg = createMessage(this, 'destroyed');
+  return function(doc) {
+    const msg = createMessage(doc, 'destroyed');
     publisher(msg);
   }
 }
 
 module.exports = {
+  wasNewHook:           wasNewHook,
   createCreatedHook:    createCreatedHook,
   createUpdatedHook:    createUpdatedHook,
   createDestroyedHook:  createDestroyedHook
