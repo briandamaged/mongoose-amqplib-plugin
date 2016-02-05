@@ -7,29 +7,16 @@ const hooks = require('./hooks'),
 
 const createPublisher = require('./publisher');
 
-// These are the "Global Options" that will be used when
-// creating new plugin instances.  They can be overridden
-// by both Factory and Plugin options.
-const gOptions = {
-  exchange:   'model.events',
-  routingKey: ''
-};
+const defaultOptions = require('./options');
 
+function plugin(schema, o) {
+  o = Object.assign({}, defaultOptions, o);
+  const p = createPublisher(o.channel, o.exchange, o.routingKey, o.options);
 
-function createPlugin(fOptions) {
-  fOptions = fOptions || {};
-
-  return function(schema, pOptions) {
-    const o = Object.assign({}, gOptions, fOptions, pOptions);
-    const p = createPublisher(o.channel, o.exchange, o.routingKey, o.options);
-
-    schema.pre('save',    createCreatedHook(p));
-    schema.pre('save',    createUpdatedHook(p));
-    schema.post('remove', createDestroyedHook(p));
-  }
+  schema.pre('save',    createCreatedHook(p));
+  schema.pre('save',    createUpdatedHook(p));
+  schema.post('remove', createDestroyedHook(p));
 }
 
 
-
-module.exports = createPlugin;
-
+module.exports = plugin;
